@@ -22,8 +22,7 @@ copyright notice and this notice must be preserved on all copies.  */
 extern FILE *yyin;
 extern char *yytext;
 extern int yyerror_count;
-extern void yyerror(char *str); /* Our version. */
-extern int yywrap(void); /* Our version. */
+/*  extern void yyerror(char *str);  Our version.  */
 extern int yylex(void); /* Lexical analyzer function. */
 extern int yyparse(void); /* Parser function. */
 

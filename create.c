@@ -910,7 +910,7 @@ perform_operand(int np, double tmp1, double tmp2, expr *ep)
 	if (ep->vvp == NULL) {
 	    if (get_define_value(ep->u.strg, &val) != 0) {
 		sprintf(msg,"ERROR : variable `%s is undefined",ep->u.strg);
-		yyerror(msg);
+		VPPerror(msg);
 	    }
 	}
 	else {

@@ -33,8 +33,6 @@ copyright notice and this notice must be preserved on all copies.  */
 #define MAXSTR 256
 #define MAXNAME 16384
 #define BASE 89
-#define	FALSE	0
-#define	TRUE	1
 #define MALLOC(type)     ((type *) malloc(sizeof(type)))
 #define NMALLOC(n,type)  ((type *) malloc((n)*sizeof(type)))
 #define CALLOC(n,type)   ((type *) calloc((n),sizeof(type)))

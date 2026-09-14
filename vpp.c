@@ -23,9 +23,9 @@ copyright notice and this notice must be preserved on all copies.  */
  * Description :
  */
 
-#include "common.h"
-#include "yacc_stuff.h"
-#include "proto.h"
+#include "./common.h"
+#include "./yacc_stuff.h"
+#include "./proto.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -155,9 +155,11 @@ main(int argc, char *argv[])
 	/*
 	 * check to see if the file can be opened for reading...
 	 */
+        FILE *infile = NULL;
 	if (!filehead)
 		{
-		yyin = stdin;
+                infile = stdin;
+                VPPset_in(infile);
 		current_file = NMALLOC(strlen("<stdin>")+1, char);
 		strcpy(current_file, "<stdin>");
 
@@ -165,8 +167,8 @@ main(int argc, char *argv[])
 		if (!output_quite)
 			fprintf(stderr, "Preprocessing '%s'\n", current_file);
 		do_comment_count(TRUE, nl_count);
-		yyparse();
-		fclose(yyin);
+		VPPparse();
+		fclose(infile);
 		free(current_file);
 		}
 	else
@@ -174,8 +176,8 @@ main(int argc, char *argv[])
 		filecurr = filehead;
 		while (filecurr)
 			{
-			yyin = fopen(filecurr->name, "r");
-      		if (yyin == NULL)
+			infile = fopen(filecurr->name, "r");
+      		if (infile == NULL)
 				{
         		fprintf(stderr, "** %s: open failed\n", filecurr->name);
 				++yyerror_count;
@@ -185,14 +187,15 @@ main(int argc, char *argv[])
       			current_file = NMALLOC(strlen(filecurr->name)+1, char);
       			strcpy(current_file, filecurr->name);
 
+                                VPPset_in(infile);
 				nl_count = 1;
 				if (!output_quite) {
 					fprintf(stderr, "vpp 1.2.0, see 'https://github.com/balanx/vbpp'\n");
 					fprintf(stderr, "Preprocessing '%s'\n", current_file);
 				}
 				do_comment_count(TRUE, nl_count);
-				yyparse();
-				fclose(yyin);
+				VPPparse();
+				fclose(infile);
 				free(current_file);
 				}
 

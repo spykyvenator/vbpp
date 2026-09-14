@@ -1,3 +1,6 @@
+%define api.prefix {VPP}
+%define api.token.prefix {VPP}
+
 %{
 /* Copyright (C) 1996 Himanshu M. Thaker
 
@@ -43,10 +46,11 @@ copyright notice and this notice must be preserved on all copies.  */
  * All features except string handling.
  */
 
+#define yytext VPPtext
 #include <stdio.h>
-#include "common.h"
-#include "yacc_stuff.h"
-#include "proto.h"
+#include "./common.h"
+#include "./yacc_stuff.h"
+#include "./proto.h"
 
 char ttid[MAXNAME];
 var_list *head_table = NULL;
@@ -574,34 +578,34 @@ identifier : TTNAME
  **********************************************************************/
 %%
 
-void
-yyerror(char *s)
-{
-    int len_tok; /* length of yytext */
-    int len_line; /* length of current line */
-    int i;
-
-    fprintf(stderr,"%5d:%s\n",nl_count-1,old_line);
-    fprintf(stderr,"%5d:%s\n",nl_count,current_line);
-    len_tok = strlen(yytext);
-    len_line = strlen(current_line);
-    if ((len_line-len_tok) > 0) {
-	for (i=0; i<(len_line-len_tok-1+7); i++) fprintf(stderr," ");
-	
-	for (i=len_line-len_tok; i<len_line; i++) fprintf(stderr,"^");
-	fprintf(stderr,"\n");
-    }
-    fprintf(stderr,"%s\n\tfile '%s'",s, current_file);
-    fprintf(stderr," near line %d\n",nl_count);
-
-    /* Keep track of number of errors for program exit. */
-    ++yyerror_count;
-    if (yyerror_count > 100) {
-	fflush(stdout);
-	fprintf(stderr, "\nToo many errors, giving up.\n");
-	exit(yyerror_count);
-    }
-}
+//void
+//yyerror(char *s)
+//{
+//    int len_tok; /* length of yytext */
+//    int len_line; /* length of current line */
+//    int i;
+//
+//    fprintf(stderr,"%5d:%s\n",nl_count-1,old_line);
+//    fprintf(stderr,"%5d:%s\n",nl_count,current_line);
+//    len_tok = strlen(yytext);
+//    len_line = strlen(current_line);
+//    if ((len_line-len_tok) > 0) {
+//	for (i=0; i<(len_line-len_tok-1+7); i++) fprintf(stderr," ");
+//	
+//	for (i=len_line-len_tok; i<len_line; i++) fprintf(stderr,"^");
+//	fprintf(stderr,"\n");
+//    }
+//    fprintf(stderr,"%s\n\tfile '%s'",s, current_file);
+//    fprintf(stderr," near line %d\n",nl_count);
+//
+//    /* Keep track of number of errors for program exit. */
+//    ++yyerror_count;
+//    if (yyerror_count > 100) {
+//	fflush(stdout);
+//	fprintf(stderr, "\nToo many errors, giving up.\n");
+//	exit(yyerror_count);
+//    }
+//}
 
 int
 yywrap ()

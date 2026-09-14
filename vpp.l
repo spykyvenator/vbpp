@@ -1,5 +1,14 @@
+%option prefix="VPP" noyywrap
 %p 6000
 %e 2000
+
+%top {
+#define YYSTYPE VPPSTYPE
+#define YYSTATE VPPSTATE
+#define yytext VPPtext
+#define yyerror VPPerror
+}
+
 %{
 
 /* Copyright (C) 1996 Himanshu M. Thaker
@@ -111,9 +120,9 @@ MEM		\[[^;\n\]]*\]
 
 %%
 
-<INITIAL>"/*"		{cmnt_saved_state = YYSTATE;printf("%s",yytext);BEGIN(CMNT);}
+<INITIAL>"/*"		{cmnt_saved_state = YYSTATE;printf("%s",VPPtext);BEGIN(CMNT);}
 <COPY>"/*"		{cmnt_saved_state = YYSTATE;store_it(yytext,FALSE,FALSE);BEGIN(CCMNT);}
-<MPP>"/*"		{cmnt_saved_state = YYSTATE;store_it(yytext,FALSE,FALSE);BEGIN(CCMNT);return TTCOMMENT2;}
+<MPP>"/*"		{cmnt_saved_state = YYSTATE;store_it(yytext,FALSE,FALSE);BEGIN(CCMNT);return VPPTTCOMMENT2;}
 
 <CMNT>{NEWLINE} 	{printf("%s",yytext);nl_count++;}
 <CMNT>"/*" 		{printf("%s",yytext);fprintf(stderr,"WARNING : `/*' within comment\n");}
@@ -126,7 +135,7 @@ MEM		\[[^;\n\]]*\]
 
 <INITIAL>"//".*$	{printf("%s",yytext);}
 <COPY>"//".*$		{store_it(yytext,FALSE,FALSE);}
-<MPP>"//".*$		{store_it(yytext,FALSE,FALSE);return TTCOMMENT;}
+<MPP>"//".*$		{store_it(yytext,FALSE,FALSE);return VPPTTCOMMENT;}
 
 <COPY>`accelerate		{store_it(yytext,FALSE,FALSE);}
 <COPY>`noaccelerate		{store_it(yytext,FALSE,FALSE);}
@@ -196,21 +205,21 @@ MEM		\[[^;\n\]]*\]
 <INITIAL>`nounconnected_drive	{printf("%s",yytext);}
 <INITIAL>`uselib		{printf("%s",yytext);}
 
-<INITIAL,COPY>^{WHITE}*"`ifdef"		{return TTIFDEF;}
-<INITIAL,COPY>^{WHITE}*"`ifndef"	{return TTIFNDEF;}
-<INITIAL,COPY>^{WHITE}*"`if"		{return TTIF;}
-<INITIAL,COPY>^{WHITE}*"`let"		{return TTLET;}
-<INITIAL,COPY>^{WHITE}*"`for"		{return TTFOR;}
-<INITIAL,COPY>^{WHITE}*"`while"		{return TTWHILE;}
-<INITIAL,COPY>^{WHITE}*"`switch"	{return TTSWITCH;}
-<INITIAL,COPY>^{WHITE}*"`case"		{return TTCASE;}
-<INITIAL,COPY>^{WHITE}*"`default"	{return TTDEFAULT;}
-<INITIAL,COPY>^{WHITE}*`breaksw[^\n]*	{return TTBREAKSW;}
-<INITIAL,COPY>^{WHITE}*`else[^\n]*	{return TTELSE;}
-<INITIAL,COPY>^{WHITE}*`endif[^\n]*	{return TTENDIF;}
-<INITIAL,COPY>^{WHITE}*`endfor[^\n]*	{return TTENDFOR;}
-<INITIAL,COPY>^{WHITE}*`endwhile[^\n]*	{return TTENDWHILE;}
-<INITIAL,COPY>^{WHITE}*`endswitch[^\n]*	{return TTENDSWITCH;}
+<INITIAL,COPY>^{WHITE}*"`ifdef"		{return VPPTTIFDEF;}
+<INITIAL,COPY>^{WHITE}*"`ifndef"	{return VPPTTIFNDEF;}
+<INITIAL,COPY>^{WHITE}*"`if"		{return VPPTTIF;}
+<INITIAL,COPY>^{WHITE}*"`let"		{return VPPTTLET;}
+<INITIAL,COPY>^{WHITE}*"`for"		{return VPPTTFOR;}
+<INITIAL,COPY>^{WHITE}*"`while"		{return VPPTTWHILE;}
+<INITIAL,COPY>^{WHITE}*"`switch"	{return VPPTTSWITCH;}
+<INITIAL,COPY>^{WHITE}*"`case"		{return VPPTTCASE;}
+<INITIAL,COPY>^{WHITE}*"`default"	{return VPPTTDEFAULT;}
+<INITIAL,COPY>^{WHITE}*`breaksw[^\n]*	{return VPPTTBREAKSW;}
+<INITIAL,COPY>^{WHITE}*`else[^\n]*	{return VPPTTELSE;}
+<INITIAL,COPY>^{WHITE}*`endif[^\n]*	{return VPPTTENDIF;}
+<INITIAL,COPY>^{WHITE}*`endfor[^\n]*	{return VPPTTENDFOR;}
+<INITIAL,COPY>^{WHITE}*`endwhile[^\n]*	{return VPPTTENDWHILE;}
+<INITIAL,COPY>^{WHITE}*`endswitch[^\n]*	{return VPPTTENDSWITCH;}
 
 <INITIAL>`define	{yyless(yyleng);yymore();tick_saved_state=INITIAL;BEGIN(MACRO);}
 <COPY>`define		{yyless(yyleng);yymore();tick_saved_state=COPY;BEGIN(MACRO);}
@@ -290,19 +299,19 @@ MEM		\[[^;\n\]]*\]
 		  }
 		}
 
-<MPP>"LOG2"	{return TTLOG2;}
-<MPP>"ROUND"	{return TTROUND;}
-<MPP>"CEIL"	{return TTCEIL;}
-<MPP>"FLOOR"	{return TTFLOOR;}
-<MPP>"MAX"	{return TTMAX;}
-<MPP>"MIN"	{return TTMIN;}
-<MPP>"ABS"	{return TTABS;}
-<MPP>"STOI"	{return TTSTOI;}
-<MPP>"ITOS"	{return TTITOS;}
-<MPP>"SUBSTR"	{return TTSUBSTR;}
-<MPP>"SYSTEM"	{return TTSYSTEM;}
-<MPP>"EVEN"	{return TTEVEN;}
-<MPP>"ODD"	{return TTODD;}
+<MPP>"LOG2"	{return VPPTTLOG2;}
+<MPP>"ROUND"	{return VPPTTROUND;}
+<MPP>"CEIL"	{return VPPTTCEIL;}
+<MPP>"FLOOR"	{return VPPTTFLOOR;}
+<MPP>"MAX"	{return VPPTTMAX;}
+<MPP>"MIN"	{return VPPTTMIN;}
+<MPP>"ABS"	{return VPPTTABS;}
+<MPP>"STOI"	{return VPPTTSTOI;}
+<MPP>"ITOS"	{return VPPTTITOS;}
+<MPP>"SUBSTR"	{return VPPTTSUBSTR;}
+<MPP>"SYSTEM"	{return VPPTTSYSTEM;}
+<MPP>"EVEN"	{return VPPTTEVEN;}
+<MPP>"ODD"	{return VPPTTODD;}
 
 <INITIAL>`{NAME}|`"{"{NAME}"}"    {
 			 names *np = lookup_define(Defines_Table,yytext+1);
@@ -362,7 +371,7 @@ MEM		\[[^;\n\]]*\]
 			 tick_saved_state = -1;
 			}
 
-<INITIAL>{WHITE}+	{strcpy(ttid, yytext);return TTWHITE;}
+<INITIAL>{WHITE}+	{strcpy(ttid, yytext);return VPPTTWHITE;}
 <INITIAL,MPP>{NAME}	{
 			 if (strchr(yytext,'`') != 0) {
 			   fprintf(stderr,
@@ -370,7 +379,7 @@ MEM		\[[^;\n\]]*\]
 				   yytext);
 			 }
 			 strcpy(ttid, yytext);
-			 return TTNAME;
+			 return VPPTTNAME;
 			}
 
 <INITIAL>\\::		{printf("::");}
@@ -378,11 +387,11 @@ MEM		\[[^;\n\]]*\]
 
 <*>::			{}
 
-<INITIAL,MPP>{NMBR10}			{strcpy(ttid, yytext); return TTNUM;}
-<INITIAL,MPP>{DIGIT10}*\.{DIGIT10}+	{strcpy(ttid, yytext);return TTREALNUM;}
-<INITIAL,MPP>{DIGIT10}+\.{DIGIT10}*	{strcpy(ttid, yytext);return TTREALNUM;}
+<INITIAL,MPP>{NMBR10}			{strcpy(ttid, yytext); return VPPTTNUM;}
+<INITIAL,MPP>{DIGIT10}*\.{DIGIT10}+	{strcpy(ttid, yytext);return VPPTTREALNUM;}
+<INITIAL,MPP>{DIGIT10}+\.{DIGIT10}*	{strcpy(ttid, yytext);return VPPTTREALNUM;}
 
-<MPP>\"[^\"\n]*[\"]?  {strcpy(ttid,yytext);return TTQS;}
+<MPP>\"[^\"\n]*[\"]?  {strcpy(ttid,yytext);return VPPTTQS;}
 <MPP>{WHITE}+	{}
 <MPP>{NEWLINE}	{nl_count++;return '\n';}
 <MPP>"`"	{}
@@ -394,26 +403,26 @@ MEM		\[[^;\n\]]*\]
 <MPP>"*"	{return '*';}
 <MPP>"/"	{return '/';}
 <MPP>"%"	{return '%';}
-<MPP>"**"	{return TT_POWER;}
-<MPP>"=="	{return TTL_EQ;}
-<MPP>"!="	{return TTL_NEQ;}
-<MPP>"&&"	{return TTL_AND;}
-<MPP>"||"	{return TTL_OR;}
+<MPP>"**"	{return VPPTT_POWER;}
+<MPP>"=="	{return VPPTTL_EQ;}
+<MPP>"!="	{return VPPTTL_NEQ;}
+<MPP>"&&"	{return VPPTTL_AND;}
+<MPP>"||"	{return VPPTTL_OR;}
 <MPP>"<"	{return '<';}
-<MPP>"<="	{return TTL_LEQ;}
+<MPP>"<="	{return VPPTTL_LEQ;}
 <MPP>">"	{return '>';}
-<MPP>">="	{return TTL_GEQ;}
+<MPP>">="	{return VPPTTL_GEQ;}
 <MPP>"&"	{return '&';}
 <MPP>"|"	{return '|';}
 <MPP>"^"	{return '^';}
-<MPP>"<<"	{return TTL_SHIFTL;}
-<MPP>">>"	{return TTL_SHIFTR;}
+<MPP>"<<"	{return VPPTTL_SHIFTL;}
+<MPP>">>"	{return VPPTTL_SHIFTR;}
 <MPP>"!"	{return '!';}
 <MPP>"="	{return '=';}
 <MPP>";"	{return ';';}
 <MPP>"~"	{return '~';}
 <MPP>","	{return ',';}
-<MPP>.		{return TT_UNKNOWN;}
+<MPP>.		{return VPPTT_UNKNOWN;}
 
 <COPY>{NEWLINE}	{store_it(yytext,FALSE,FALSE);nl_count++;}
 <COPY>.		{store_it(yytext,FALSE,FALSE);}
