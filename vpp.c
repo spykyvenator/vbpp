@@ -34,7 +34,7 @@ struct vpp_filename
 	struct vpp_filename *next;   
 	char *name;
 	};
-struct vpp_filename *vpp_incdir;
+extern struct vpp_filename *vpp_incdir;
 int output_quite;
 
 int
@@ -211,28 +211,3 @@ main(int argc, char *argv[])
 	return yyerror_count;
 	}
 
-FILE *
-incdir_fopen(char *name)
-	{
-	int len;
-	struct vpp_filename *l;  
-	char *path;
-	FILE *fp = NULL;
-
-	len = strlen(name);
-	l = vpp_incdir;
-	while (l)
-        {
-        path = (char *)malloc(strlen(l->name) + 1 + len + 1);
-        sprintf(path, "%s/%s", l->name, name);
-        fp = fopen(path, "r");
-        free(path);
-        if (fp)
-			break;
-		l = l->next;
-        }
-
-	if (!fp)
-		fp = fopen(name, "r");
-	return(fp);
-	}

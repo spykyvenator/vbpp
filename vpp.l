@@ -1,4 +1,4 @@
-%option prefix="VPP" noyywrap
+%option prefix="VPP" noyywrap nodefault 
 %p 6000
 %e 2000
 
@@ -6,7 +6,6 @@
 #define YYSTYPE VPPSTYPE
 #define YYSTATE VPPSTATE
 #define yytext VPPtext
-#define yyerror VPPerror
 }
 
 %{
@@ -60,6 +59,12 @@ typedef struct names
 	struct macro_parms *parms;
 	struct names *next;
    } names;
+struct vpp_filename
+	{
+	struct vpp_filename *next;   
+	char *name;
+	};
+struct vpp_filename *vpp_incdir;
 
 void store_it(char *str, int subst, int expand_define);
 int hash(char *text);
@@ -99,6 +104,18 @@ int tick_saved_state = -1;
 #define MM 1
 #define PE 2
 #define ME 3
+
+#include <stdarg.h>
+
+int
+printf(const char *s, ...)
+{
+        va_list ap;
+        va_start (ap, s);
+        int r = fprintf(stderr, s, ap);
+        va_end(ap);
+        return r;
+}
 
 %}
 
@@ -429,6 +446,8 @@ MEM		\[[^;\n\]]*\]
 <INITIAL>{NEWLINE} {printf("\n");do_comment_count(FALSE,nl_count);nl_count++;}
 <INITIAL>.	{printf("%c",yytext[0]);}
 
+. { fprintf(stderr, "%s", yytext); }
+
 %%
 
 void
@@ -442,7 +461,7 @@ store_it(char *str, int subst, int expand_define)
     if ((strcmp(str,"\n") != 0) && (!subst)) {
 	len = strlen(line) + strlen(str);
 	if (len > MAXNAME)
-	    yyerror("line too long");
+	    VPPerror("line too long");
 	else
 	    sprintf(line, "%s%s", line, str);
     }
@@ -501,7 +520,7 @@ store_it(char *str, int subst, int expand_define)
 	    else {
 		if ((vvp = get_variable_ref(STRING,str+1)) == NULL) {
 		    sprintf(nn,"ERROR : `%s' not defined",str+1);
-		    yyerror(nn);
+		    VPPerror(nn);
 		}
 		code_pointer->tail->ll_type = CODE_POINTER2;
 		code_pointer->tail->item =
@@ -610,7 +629,7 @@ lookup_define(names *table[], char *macro_name)
         int  len = strlen(macro_name);
 
         if (macro_name[len - 1] != '}') {
-            yyerror("ERROR : missing '}'\n");
+            VPPerror("ERROR : missing '}'\n");
             return(NULL);
         } else {
             int i = 0;
@@ -904,7 +923,7 @@ print_variable(char *name, int expand_define)
 	vvp = get_variable_ref(STRING,name);
 	if (vvp == NULL) {
 	    sprintf(strg,"ERROR : `%s' not defined",name);
-	    yyerror(strg);
+	    VPPerror(strg);
 	}
 	else {
 	    if ((vvp->strg)[0] == '"') {
@@ -940,7 +959,7 @@ store_lines()
     else {
 	int len = strlen(current_line) + strlen(yytext);
 	if (len > MAXNAME)
-	    yyerror("line too long");
+	    VPPerror("line too long");
 	else
 	    strcat(current_line, yytext);
     }
@@ -1123,3 +1142,28 @@ set_to_last_mode()
  *
  **************************************************************************/
 
+FILE *
+incdir_fopen(char *name)
+	{
+	int len;
+	struct vpp_filename *l;  
+	char *path;
+	FILE *fp = NULL;
+
+	len = strlen(name);
+	l = vpp_incdir;
+	while (l)
+        {
+        path = (char *)malloc(strlen(l->name) + 1 + len + 1);
+        sprintf(path, "%s/%s", l->name, name);
+        fp = fopen(path, "r");
+        free(path);
+        if (fp)
+			break;
+		l = l->next;
+        }
+
+	if (!fp)
+		fp = fopen(name, "r");
+	return(fp);
+	}

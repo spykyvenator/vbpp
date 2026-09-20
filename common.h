@@ -31,6 +31,8 @@ copyright notice and this notice must be preserved on all copies.  */
  * then, some globally accessible defines...
  */
 #define MAXSTR 256
+#define TRUE (1)
+#define FALSE (0)
 #define MAXNAME 16384
 #define BASE 89
 #define MALLOC(type)     ((type *) malloc(sizeof(type)))
